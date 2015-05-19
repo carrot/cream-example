@@ -35,9 +35,9 @@ import retrofit.client.Response;
  * You'll need to implement the toString() method in a manner that uniquely identifies
  * the API call.
  */
-public class GithubRepoLoader extends DefaultLoader<GithubRepoLoader.RepoDefinition>{
+public class GithubRepoLoader extends DefaultLoader<GithubRepoLoader.RepoParams>{
 
-    public GithubRepoLoader(Context context, CacheStrategy<GithubRepoLoader.RepoDefinition> cacheStrategy) {
+    public GithubRepoLoader(Context context, CacheStrategy<RepoParams> cacheStrategy) {
         super(context, cacheStrategy);
     }
 
@@ -47,18 +47,18 @@ public class GithubRepoLoader extends DefaultLoader<GithubRepoLoader.RepoDefinit
     }
 
     @Override
-    protected void loadFromSource(final GithubRepoLoader.RepoDefinition repo, final SingleLoaderCallback cb){
+    protected void loadFromSource(final RepoParams repoParams, final SingleLoaderCallback cb){
         final GithubRepoLoader thisLoader = this;
 
-        GithubAPIBuilder.getAPI().getRepo(repo.owner, repo.name, new Callback<GithubRepo>() {
+        GithubAPIBuilder.getAPI().getRepo(repoParams.owner, repoParams.name, new Callback<GithubRepo>() {
             @Override
             public void success(GithubRepo githubRepo, Response response) {
-                mCacheStrategy.handleSourceSuccess(repo, githubRepo, thisLoader, cb);
+                mCacheStrategy.handleSourceSuccess(repoParams, githubRepo, thisLoader, cb);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                mCacheStrategy.handleSourceFailure(repo, error, thisLoader, cb);
+                mCacheStrategy.handleSourceFailure(repoParams, error, thisLoader, cb);
             }
         });
     }
@@ -67,7 +67,7 @@ public class GithubRepoLoader extends DefaultLoader<GithubRepoLoader.RepoDefinit
      * See "Multiple params in API Call"
      * section in GithubRepoLoader
      */
-    public class RepoDefinition implements LoaderParams
+    public class RepoParams implements LoaderParams
     {
         public String owner;
         public String name;
