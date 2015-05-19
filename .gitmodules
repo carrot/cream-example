@@ -1,0 +1,3 @@
+[submodule "cream"]
+	path = cream
+	url = git@github.com:carrot/cream.git
