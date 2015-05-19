@@ -3,6 +3,7 @@ package com.carrotcreative.cream_example.app.cache.loaders;
 import android.content.Context;
 
 import com.carrotcreative.cream.loaders.single.SingleLoaderCallback;
+import com.carrotcreative.cream.params.LoaderParams;
 import com.carrotcreative.cream.strategies.generic.CacheStrategy;
 import com.carrotcreative.cream_example.app.net.GithubAPIBuilder;
 import com.carrotcreative.cream_example.app.net.GithubRepo;
@@ -36,7 +37,7 @@ import retrofit.client.Response;
  */
 public class GithubRepoLoader extends DefaultLoader<GithubRepoLoader.RepoDefinition>{
 
-    public GithubRepoLoader(Context context, CacheStrategy cacheStrategy) {
+    public GithubRepoLoader(Context context, CacheStrategy<GithubRepoLoader.RepoDefinition> cacheStrategy) {
         super(context, cacheStrategy);
     }
 
@@ -46,7 +47,7 @@ public class GithubRepoLoader extends DefaultLoader<GithubRepoLoader.RepoDefinit
     }
 
     @Override
-    protected void loadFromSource(final RepoDefinition repo, final SingleLoaderCallback cb){
+    protected void loadFromSource(final GithubRepoLoader.RepoDefinition repo, final SingleLoaderCallback cb){
         final GithubRepoLoader thisLoader = this;
 
         GithubAPIBuilder.getAPI().getRepo(repo.owner, repo.name, new Callback<GithubRepo>() {
@@ -66,13 +67,13 @@ public class GithubRepoLoader extends DefaultLoader<GithubRepoLoader.RepoDefinit
      * See "Multiple params in API Call"
      * section in GithubRepoLoader
      */
-    public class RepoDefinition
+    public class RepoDefinition implements LoaderParams
     {
         public String owner;
         public String name;
 
         @Override
-        public String toString()
+        public String getIdentifier()
         {
             return owner + "." + name;
         }

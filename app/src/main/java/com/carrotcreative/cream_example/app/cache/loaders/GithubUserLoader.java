@@ -4,7 +4,9 @@ import android.content.Context;
 
 import com.carrotcreative.cream.loaders.single.SingleLoader;
 import com.carrotcreative.cream.loaders.single.SingleLoaderCallback;
+import com.carrotcreative.cream.params.LoaderParams;
 import com.carrotcreative.cream.strategies.generic.CacheStrategy;
+import com.carrotcreative.cream_example.app.cache.params.GithubUserLoaderParams;
 import com.carrotcreative.cream_example.app.net.GithubAPIBuilder;
 import com.carrotcreative.cream_example.app.net.GithubUser;
 
@@ -17,9 +19,9 @@ import retrofit.client.Response;
  * A normal implementation would probably extend our DefaultLoader,
  * so we can avoid filling out all of the methods.
  */
-public class GithubUserLoader extends SingleLoader<String> {
+public class GithubUserLoader extends SingleLoader<GithubUserLoaderParams> {
 
-    public GithubUserLoader(Context context, CacheStrategy<String> cacheStrategy) {
+    public GithubUserLoader(Context context, CacheStrategy<GithubUserLoaderParams> cacheStrategy) {
         super(context, cacheStrategy);
     }
 
@@ -70,7 +72,7 @@ public class GithubUserLoader extends SingleLoader<String> {
      * be possible.
      */
     @Override
-    public boolean shouldCache(String user) {
+    public boolean shouldCache(GithubUserLoaderParams user) {
         return true;
     }
 
@@ -80,19 +82,19 @@ public class GithubUserLoader extends SingleLoader<String> {
      * as long as you can pack the result into a serializable object.
      */
     @Override
-    protected void loadFromSource(final String user, final SingleLoaderCallback singleLoaderCallback) {
+    protected void loadFromSource(final GithubUserLoaderParams param, final SingleLoaderCallback singleLoaderCallback) {
 
-        final SingleLoader<String> thisLoader = this;
+        final SingleLoader<GithubUserLoaderParams> thisLoader = this;
 
-        GithubAPIBuilder.getAPI().getUser(user, new Callback<GithubUser>() {
+        GithubAPIBuilder.getAPI().getUser(param.getUserId(), new Callback<GithubUser>() {
             @Override
             public void success(GithubUser githubUser, Response response) {
-                mCacheStrategy.handleSourceSuccess(user, githubUser, thisLoader, singleLoaderCallback);
+                mCacheStrategy.handleSourceSuccess(param, githubUser, thisLoader, singleLoaderCallback);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                mCacheStrategy.handleSourceFailure(user, error, thisLoader, singleLoaderCallback);
+                mCacheStrategy.handleSourceFailure(param, error, thisLoader, singleLoaderCallback);
             }
         });
     }
