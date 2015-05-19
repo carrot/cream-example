@@ -19,6 +19,6 @@ public class GithubUserLoaderParams implements LoaderParams
     @Override
     public String getIdentifier()
     {
-        return mUserId;
+        return getUserId();
     }
 }
