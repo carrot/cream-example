@@ -11,6 +11,7 @@ import com.carrotcreative.cream.strategies.generic.CacheStrategy;
 import com.carrotcreative.cream.strategies.CachePreferred;
 import com.carrotcreative.cream_example.app.R;
 import com.carrotcreative.cream_example.app.cache.loaders.GithubUserLoader;
+import com.carrotcreative.cream_example.app.cache.params.GithubUserLoaderParams;
 import com.carrotcreative.cream_example.app.net.GithubUser;
 import com.carrotcreative.cream_example.app.util.DisplayManager;
 
@@ -56,16 +57,17 @@ public class RetryLoaderActivity extends Activity implements RetrySingleLoaderCa
 
         // Getting the userName from the field
         String userName = mUsernameField.getText().toString();
+        GithubUserLoaderParams params = new GithubUserLoaderParams(userName);
 
         //Creating a StandardCacheStrategy object to plug into the Loader
-        CacheStrategy<String> cacheStrategy = new CachePreferred<String>(this);
+        CacheStrategy<GithubUserLoaderParams> cacheStrategy = new CachePreferred<GithubUserLoaderParams>(this);
 
         // Creating the loader + calling loadSelf
         GithubUserLoader loader = new GithubUserLoader(this, cacheStrategy);
 
         // Creating the Retry Loader wrapper
-        mRetryLoader = new RetrySingleLoader<String>(loader);
-        mRetryLoader.loadSelf(userName, this);
+        mRetryLoader = new RetrySingleLoader<GithubUserLoaderParams>(loader);
+        mRetryLoader.loadSelf(params, this);
     }
 
     @Override

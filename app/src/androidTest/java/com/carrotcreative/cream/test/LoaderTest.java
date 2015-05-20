@@ -16,6 +16,7 @@ import com.carrotcreative.cream.test.util.AsyncFunctionFunctor;
 import com.carrotcreative.cream.test.util.AsyncFunctionTest;
 import com.carrotcreative.cream.test.util.ErrorHolder;
 import com.carrotcreative.cream_example.app.cache.loaders.GithubUserLoader;
+import com.carrotcreative.cream_example.app.cache.params.GithubUserLoaderParams;
 import com.carrotcreative.cream_example.app.net.GithubUser;
 
 import java.io.Serializable;
@@ -26,8 +27,8 @@ public class LoaderTest extends InstrumentationTestCase {
 
     private static final int TIMEOUT = 15;
     private static final int RETRY_ATTEMPTS = 5;
-    private static final String sGithubUserName = "BrandonRomano";
-    private ArrayList<String> mGithubUserNames;
+    private static final GithubUserLoaderParams sGithubUserParamSingle = new GithubUserLoaderParams("BrandonRomano");
+    private ArrayList<GithubUserLoaderParams> mGithubUserParams;
 
     public LoaderTest()
     {
@@ -39,11 +40,11 @@ public class LoaderTest extends InstrumentationTestCase {
         super.setUp();
 
         // Creating an ArrayList of all of the users we will download
-        mGithubUserNames = new ArrayList<String>();
-        mGithubUserNames.add("BrandonRomano");
-        mGithubUserNames.add("pruett");
-        mGithubUserNames.add("kylemac");
-        mGithubUserNames.add("nporteschaikin");
+        mGithubUserParams = new ArrayList<GithubUserLoaderParams>();
+        mGithubUserParams.add(new GithubUserLoaderParams("BrandonRomano"));
+        mGithubUserParams.add(new GithubUserLoaderParams("roideuniverse"));
+        mGithubUserParams.add(new GithubUserLoaderParams("antonelli"));
+        mGithubUserParams.add(new GithubUserLoaderParams("kylemac"));
     }
 
     protected void tearDown() throws Exception
@@ -56,7 +57,7 @@ public class LoaderTest extends InstrumentationTestCase {
      */
     public void testSingleLoader() throws Throwable {
         // Creating a StandardCacheStrategy object to plug into the Loader
-        CacheStrategy<String> cacheStrategy = new CachePreferred<String>(getInstrumentation().getContext());
+        CacheStrategy<GithubUserLoaderParams> cacheStrategy = new CachePreferred<GithubUserLoaderParams>(getInstrumentation().getContext());
 
         // Creating the loader
         final GithubUserLoader loader = new GithubUserLoader(getInstrumentation().getContext(), cacheStrategy);
@@ -66,7 +67,7 @@ public class LoaderTest extends InstrumentationTestCase {
             @Override
             public void runAsync(final CountDownLatch signal, final ErrorHolder errorHolder) {
 
-                loader.loadSelf(sGithubUserName, new SingleLoaderCallback() {
+                loader.loadSelf(sGithubUserParamSingle, new SingleLoaderCallback() {
                     @Override
                     public void success(Serializable serializable, boolean loadedFromCache) {
                         try {
@@ -100,22 +101,22 @@ public class LoaderTest extends InstrumentationTestCase {
      */
     public void testMultipleLoader() throws Throwable {
         // Creating a StandardCacheStrategy object to plug into the Loader
-        CacheStrategy<String> cacheStrategy = new CachePreferred<String>(getInstrumentation().getContext());
+        CacheStrategy<GithubUserLoaderParams> cacheStrategy = new CachePreferred<GithubUserLoaderParams>(getInstrumentation().getContext());
 
         // Creating the loader
         final GithubUserLoader singleLoader = new GithubUserLoader(getInstrumentation().getContext(), cacheStrategy);
 
         // Creating a multiple loader with a STRICT_POLICY
-        final MultipleLoader<String> multipleLoader = new MultipleLoader<String>(MultipleLoader.STRICT_POLICY);
+        final MultipleLoader<GithubUserLoaderParams> multipleLoader = new MultipleLoader<GithubUserLoaderParams>(MultipleLoader.STRICT_POLICY);
 
         // Testing + Running
         AsyncFunctionTest.test(this, TIMEOUT, new AsyncFunctionFunctor() {
             @Override
             public void runAsync(final CountDownLatch signal, final ErrorHolder errorHolder) {
-                multipleLoader.load(mGithubUserNames, singleLoader, new MultipleLoaderCallback() {
+                multipleLoader.load(mGithubUserParams, singleLoader, new MultipleLoaderCallback() {
                     @Override
                     public void success(ArrayList<MultipleLoaderTuple> loaderTuples) {
-                        if(loaderTuples.size() != mGithubUserNames.size())
+                        if(loaderTuples.size() != mGithubUserParams.size())
                         {
                             errorHolder.mHasError = true;
                             errorHolder.mErrorMessage = "Something is wrong with STRICT_POLICY";
@@ -142,19 +143,19 @@ public class LoaderTest extends InstrumentationTestCase {
      */
     public void testRetrySingleLoader() throws Throwable {
         // Creating a StandardCacheStrategy object to plug into the Loader
-        CacheStrategy<String> cacheStrategy = new CachePreferred<String>(getInstrumentation().getContext());
+        CacheStrategy<GithubUserLoaderParams> cacheStrategy = new CachePreferred<GithubUserLoaderParams>(getInstrumentation().getContext());
 
         // Creating the loader
         final GithubUserLoader singleLoader = new GithubUserLoader(getInstrumentation().getContext(), cacheStrategy);
 
         // Creating a retry loader
-        final RetrySingleLoader<String> retrySingleLoader = new RetrySingleLoader<String>(singleLoader);
+        final RetrySingleLoader<GithubUserLoaderParams> retrySingleLoader = new RetrySingleLoader<GithubUserLoaderParams>(singleLoader);
 
         // Testing + Running
         AsyncFunctionTest.test(this, TIMEOUT, new AsyncFunctionFunctor() {
             @Override
             public void runAsync(final CountDownLatch signal, final ErrorHolder errorHolder) {
-                retrySingleLoader.loadSelf(sGithubUserName, new RetrySingleLoaderCallback() {
+                retrySingleLoader.loadSelf(sGithubUserParamSingle, new RetrySingleLoaderCallback() {
                     @Override
                     public void success(Serializable serializable, boolean b) {
                         try {
@@ -195,25 +196,25 @@ public class LoaderTest extends InstrumentationTestCase {
      */
     public void testRetryMultipleLoader() throws Throwable {
         // Creating a StandardCacheStrategy object to plug into the Loader
-        CacheStrategy<String> cacheStrategy = new CachePreferred<String>(getInstrumentation().getContext());
+        CacheStrategy<GithubUserLoaderParams> cacheStrategy = new CachePreferred<GithubUserLoaderParams>(getInstrumentation().getContext());
 
         // Creating the loader
         final GithubUserLoader singleLoader = new GithubUserLoader(getInstrumentation().getContext(), cacheStrategy);
 
         // Creating a multiple loader with a STRICT_POLICY
-        final MultipleLoader<String> multipleLoader = new MultipleLoader<String>(MultipleLoader.STRICT_POLICY);
+        final MultipleLoader<GithubUserLoaderParams> multipleLoader = new MultipleLoader<GithubUserLoaderParams>(MultipleLoader.STRICT_POLICY);
 
         // Creating a retryMultipleLoader
-        final RetryMultipleLoader<String> retryMultipleLoader = new RetryMultipleLoader<String>(multipleLoader, singleLoader);
+        final RetryMultipleLoader<GithubUserLoaderParams> retryMultipleLoader = new RetryMultipleLoader<GithubUserLoaderParams>(multipleLoader, singleLoader);
 
         // Testing + Running
         AsyncFunctionTest.test(this, TIMEOUT, new AsyncFunctionFunctor() {
             @Override
             public void runAsync(final CountDownLatch signal, final ErrorHolder errorHolder) {
-                retryMultipleLoader.loadSelf(mGithubUserNames, new RetryMultipleLoaderCallback() {
+                retryMultipleLoader.loadSelf(mGithubUserParams, new RetryMultipleLoaderCallback() {
                     @Override
                     public void success(ArrayList<MultipleLoaderTuple> loaderTuples) {
-                        if(loaderTuples.size() != mGithubUserNames.size())
+                        if(loaderTuples.size() != mGithubUserParams.size())
                         {
                             errorHolder.mHasError = true;
                             errorHolder.mErrorMessage = "Something is wrong with STRICT_POLICY";

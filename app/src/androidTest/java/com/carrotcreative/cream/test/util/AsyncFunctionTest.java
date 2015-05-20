@@ -5,6 +5,7 @@ import android.test.InstrumentationTestCase;
 import com.carrotcreative.cream.strategies.generic.CacheStrategy;
 import com.carrotcreative.cream.strategies.CachePreferred;
 import com.carrotcreative.cream_example.app.cache.loaders.GithubUserLoader;
+import com.carrotcreative.cream_example.app.cache.params.GithubUserLoaderParams;
 
 import junit.framework.TestCase;
 
@@ -22,7 +23,7 @@ public class AsyncFunctionTest {
         errorHolder.mHasError = false;
 
         // Creating a StandardCacheStrategy object to plug into the Loader
-        CacheStrategy<String> cacheStrategy = new CachePreferred<String>(testCase.getInstrumentation().getContext());
+        CacheStrategy<GithubUserLoaderParams> cacheStrategy = new CachePreferred<GithubUserLoaderParams>(testCase.getInstrumentation().getContext());
 
         // Creating the loader
         final GithubUserLoader loader = new GithubUserLoader(testCase.getInstrumentation().getContext(), cacheStrategy);
