@@ -25,7 +25,7 @@ import java.io.Serializable;
  * and the SingleLoader (defined earlier in cache.loaders)
  * will take care of the rest.
  */
-public class SingleLoaderActivity extends Activity implements SingleLoaderCallback {
+public class SingleLoaderActivity extends Activity implements SingleLoaderCallback<GithubUser> {
 
     private boolean mSubmitLock;
     private EditText mUsernameField;
@@ -61,7 +61,7 @@ public class SingleLoaderActivity extends Activity implements SingleLoaderCallba
         String userName = mUsernameField.getText().toString();
 
         //Creating a StandardCacheStrategy object to plug into the Loader
-        CacheStrategy<GithubUserLoaderParams> cacheStrategy = new CachePreferred<GithubUserLoaderParams>(this);
+        CacheStrategy<GithubUserLoaderParams, GithubUser> cacheStrategy = new CachePreferred<GithubUserLoaderParams, GithubUser>(this);
 
         // Creating the loader + calling loadSelf
         GithubUserLoader loader = new GithubUserLoader(this, cacheStrategy);
@@ -69,10 +69,7 @@ public class SingleLoaderActivity extends Activity implements SingleLoaderCallba
     }
 
     @Override
-    public void success(Serializable serializable, boolean fromCache) {
-        // Success!  We have the user here
-        GithubUser user = (GithubUser) serializable;
-
+    public void success(GithubUser user, boolean fromCache) {
         //Do whatever you want with it... Here we just display
         DisplayManager.displaySuccess(user, fromCache, mThisActivity);
     }

@@ -57,7 +57,7 @@ public class LoaderTest extends InstrumentationTestCase {
      */
     public void testSingleLoader() throws Throwable {
         // Creating a StandardCacheStrategy object to plug into the Loader
-        CacheStrategy<GithubUserLoaderParams> cacheStrategy = new CachePreferred<GithubUserLoaderParams>(getInstrumentation().getContext());
+        CacheStrategy<GithubUserLoaderParams, GithubUser> cacheStrategy = new CachePreferred<GithubUserLoaderParams, GithubUser>(getInstrumentation().getContext());
 
         // Creating the loader
         final GithubUserLoader loader = new GithubUserLoader(getInstrumentation().getContext(), cacheStrategy);
@@ -67,11 +67,14 @@ public class LoaderTest extends InstrumentationTestCase {
             @Override
             public void runAsync(final CountDownLatch signal, final ErrorHolder errorHolder) {
 
-                loader.loadSelf(sGithubUserParamSingle, new SingleLoaderCallback() {
+                loader.loadSelf(sGithubUserParamSingle, new SingleLoaderCallback<GithubUser>() {
                     @Override
-                    public void success(Serializable serializable, boolean loadedFromCache) {
+                    public void success(GithubUser user, boolean loadedFromCache) {
                         try {
-                            GithubUser user = (GithubUser) serializable;
+                            if(! (user instanceof GithubUser))
+                            {
+                                throw new ClassCastException();
+                            }
                         }
                         catch(ClassCastException e)
                         {
@@ -101,21 +104,21 @@ public class LoaderTest extends InstrumentationTestCase {
      */
     public void testMultipleLoader() throws Throwable {
         // Creating a StandardCacheStrategy object to plug into the Loader
-        CacheStrategy<GithubUserLoaderParams> cacheStrategy = new CachePreferred<GithubUserLoaderParams>(getInstrumentation().getContext());
+        CacheStrategy<GithubUserLoaderParams, GithubUser> cacheStrategy = new CachePreferred<GithubUserLoaderParams, GithubUser>(getInstrumentation().getContext());
 
         // Creating the loader
         final GithubUserLoader singleLoader = new GithubUserLoader(getInstrumentation().getContext(), cacheStrategy);
 
         // Creating a multiple loader with a STRICT_POLICY
-        final MultipleLoader<GithubUserLoaderParams> multipleLoader = new MultipleLoader<GithubUserLoaderParams>(MultipleLoader.STRICT_POLICY);
+        final MultipleLoader<GithubUserLoaderParams, GithubUser> multipleLoader = new MultipleLoader<GithubUserLoaderParams, GithubUser>(MultipleLoader.STRICT_POLICY);
 
         // Testing + Running
         AsyncFunctionTest.test(this, TIMEOUT, new AsyncFunctionFunctor() {
             @Override
             public void runAsync(final CountDownLatch signal, final ErrorHolder errorHolder) {
-                multipleLoader.load(mGithubUserParams, singleLoader, new MultipleLoaderCallback() {
+                multipleLoader.load(mGithubUserParams, singleLoader, new MultipleLoaderCallback<GithubUser>() {
                     @Override
-                    public void success(ArrayList<MultipleLoaderTuple> loaderTuples) {
+                    public void success(ArrayList<MultipleLoaderTuple<GithubUser>> loaderTuples) {
                         if(loaderTuples.size() != mGithubUserParams.size())
                         {
                             errorHolder.mHasError = true;
@@ -143,13 +146,13 @@ public class LoaderTest extends InstrumentationTestCase {
      */
     public void testRetrySingleLoader() throws Throwable {
         // Creating a StandardCacheStrategy object to plug into the Loader
-        CacheStrategy<GithubUserLoaderParams> cacheStrategy = new CachePreferred<GithubUserLoaderParams>(getInstrumentation().getContext());
+        CacheStrategy<GithubUserLoaderParams, GithubUser> cacheStrategy = new CachePreferred<GithubUserLoaderParams, GithubUser>(getInstrumentation().getContext());
 
         // Creating the loader
         final GithubUserLoader singleLoader = new GithubUserLoader(getInstrumentation().getContext(), cacheStrategy);
 
         // Creating a retry loader
-        final RetrySingleLoader<GithubUserLoaderParams> retrySingleLoader = new RetrySingleLoader<GithubUserLoaderParams>(singleLoader);
+        final RetrySingleLoader<GithubUserLoaderParams, GithubUser> retrySingleLoader = new RetrySingleLoader<GithubUserLoaderParams, GithubUser>(singleLoader);
 
         // Testing + Running
         AsyncFunctionTest.test(this, TIMEOUT, new AsyncFunctionFunctor() {
@@ -196,24 +199,24 @@ public class LoaderTest extends InstrumentationTestCase {
      */
     public void testRetryMultipleLoader() throws Throwable {
         // Creating a StandardCacheStrategy object to plug into the Loader
-        CacheStrategy<GithubUserLoaderParams> cacheStrategy = new CachePreferred<GithubUserLoaderParams>(getInstrumentation().getContext());
+        CacheStrategy<GithubUserLoaderParams, GithubUser> cacheStrategy = new CachePreferred<GithubUserLoaderParams, GithubUser>(getInstrumentation().getContext());
 
         // Creating the loader
         final GithubUserLoader singleLoader = new GithubUserLoader(getInstrumentation().getContext(), cacheStrategy);
 
         // Creating a multiple loader with a STRICT_POLICY
-        final MultipleLoader<GithubUserLoaderParams> multipleLoader = new MultipleLoader<GithubUserLoaderParams>(MultipleLoader.STRICT_POLICY);
+        final MultipleLoader<GithubUserLoaderParams, GithubUser> multipleLoader = new MultipleLoader<GithubUserLoaderParams, GithubUser>(MultipleLoader.STRICT_POLICY);
 
         // Creating a retryMultipleLoader
-        final RetryMultipleLoader<GithubUserLoaderParams> retryMultipleLoader = new RetryMultipleLoader<GithubUserLoaderParams>(multipleLoader, singleLoader);
+        final RetryMultipleLoader<GithubUserLoaderParams, GithubUser> retryMultipleLoader = new RetryMultipleLoader<GithubUserLoaderParams, GithubUser>(multipleLoader, singleLoader);
 
         // Testing + Running
         AsyncFunctionTest.test(this, TIMEOUT, new AsyncFunctionFunctor() {
             @Override
             public void runAsync(final CountDownLatch signal, final ErrorHolder errorHolder) {
-                retryMultipleLoader.loadSelf(mGithubUserParams, new RetryMultipleLoaderCallback() {
+                retryMultipleLoader.loadSelf(mGithubUserParams, new RetryMultipleLoaderCallback<GithubUser>() {
                     @Override
-                    public void success(ArrayList<MultipleLoaderTuple> loaderTuples) {
+                    public void success(ArrayList<MultipleLoaderTuple<GithubUser>> loaderTuples) {
                         if(loaderTuples.size() != mGithubUserParams.size())
                         {
                             errorHolder.mHasError = true;

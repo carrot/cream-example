@@ -13,6 +13,7 @@ import com.carrotcreative.cream.strategies.generic.CacheStrategy;
 import com.carrotcreative.cream_example.app.R;
 import com.carrotcreative.cream_example.app.cache.loaders.GithubUserLoader;
 import com.carrotcreative.cream_example.app.cache.params.GithubUserLoaderParams;
+import com.carrotcreative.cream_example.app.net.GithubUser;
 import com.carrotcreative.cream_example.app.util.DisplayManager;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
  * Multiple loader allows you to spawn multiple loaders, given multiple identifiers.
  * All of their callbacks are wrapped into one callback for ease of use.
  */
-public class MultipleLoaderActivity extends Activity implements MultipleLoaderCallback{
+public class MultipleLoaderActivity extends Activity implements MultipleLoaderCallback<GithubUser>{
 
     private boolean mSubmitLock;
     private EditText mUsernameField1;
@@ -59,21 +60,21 @@ public class MultipleLoaderActivity extends Activity implements MultipleLoaderCa
         ids.add( new GithubUserLoaderParams(mUsernameField2.getText().toString()) );
 
         //Creating a StandardCacheStrategy object to plug into the Loader
-        CacheStrategy<GithubUserLoaderParams> cacheStrategy = new CachePreferred<GithubUserLoaderParams>(this);
+        CacheStrategy<GithubUserLoaderParams, GithubUser> cacheStrategy = new CachePreferred<GithubUserLoaderParams, GithubUser>(this);
 
         // Creating the loader + calling loadSelf
         GithubUserLoader loader = new GithubUserLoader(this, cacheStrategy);
 
         // Creating a multiple loader with STRICT_POLICY, which succeeds only if all downloads succeed
         // MultipleLoader.RELAXED_POLICY will succeed if at least one succeeds.
-        MultipleLoader<GithubUserLoaderParams> multipleLoader = new MultipleLoader<GithubUserLoaderParams>(MultipleLoader.STRICT_POLICY);
+        MultipleLoader<GithubUserLoaderParams, GithubUser> multipleLoader = new MultipleLoader<GithubUserLoaderParams, GithubUser>(MultipleLoader.STRICT_POLICY);
 
         //Calling load
         multipleLoader.load(ids, loader, this);
     }
 
     @Override
-    public void success(ArrayList<MultipleLoaderTuple> loaderTuples) {
+    public void success(ArrayList<MultipleLoaderTuple<GithubUser>> loaderTuples) {
         // Displaying success, you can handle the tuples however you would like
         // Inside this tuple, mContent is the serializable object defined in the loader.
         DisplayManager.displayMultipleSuccess(loaderTuples, this);

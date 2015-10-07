@@ -54,15 +54,15 @@ public class DisplayManager {
         });
     }
 
-    public static void displayMultipleSuccess(ArrayList<MultipleLoaderTuple> loaderTuples, final Activity activity)
+    public static void displayMultipleSuccess(ArrayList<MultipleLoaderTuple<GithubUser>> loaderTuples, final Activity activity)
     {
         String displayString = "Success downloading users -- ID's: ";
 
-        Iterator<MultipleLoaderTuple> it = loaderTuples.iterator();
+        Iterator<MultipleLoaderTuple<GithubUser>> it = loaderTuples.iterator();
         while(it.hasNext())
         {
-            MultipleLoaderTuple tuple = it.next();
-            GithubUser user = (GithubUser) tuple.mContent;
+            MultipleLoaderTuple<GithubUser> tuple = it.next();
+            GithubUser user = tuple.mContent;
             displayString += user.id;
 
             if(tuple.mFromCache)

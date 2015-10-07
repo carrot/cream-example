@@ -7,6 +7,7 @@ import com.carrotcreative.cream.params.LoaderParams;
 import com.carrotcreative.cream.strategies.generic.CacheStrategy;
 import com.carrotcreative.cream_example.app.net.GithubAPIBuilder;
 import com.carrotcreative.cream_example.app.net.GithubRepo;
+import com.carrotcreative.cream_example.app.net.GithubUser;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -35,9 +36,9 @@ import retrofit.client.Response;
  * You'll need to implement the toString() method in a manner that uniquely identifies
  * the API call.
  */
-public class GithubRepoLoader extends DefaultLoader<GithubRepoLoader.RepoParams>{
+public class GithubRepoLoader extends DefaultLoader<GithubRepoLoader.RepoParams, GithubRepo>{
 
-    public GithubRepoLoader(Context context, CacheStrategy<RepoParams> cacheStrategy) {
+    public GithubRepoLoader(Context context, CacheStrategy<RepoParams, GithubRepo> cacheStrategy) {
         super(context, cacheStrategy);
     }
 
