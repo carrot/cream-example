@@ -62,10 +62,10 @@ public class DisplayManager {
         while(it.hasNext())
         {
             MultipleLoaderTuple<GithubUser> tuple = it.next();
-            GithubUser user = tuple.mContent;
+            GithubUser user = tuple.getContent();
             displayString += user.id;
 
-            if(tuple.mFromCache)
+            if(tuple.isFromCache())
                 displayString += "(Cache)";
             else
                 displayString += "(API)";
