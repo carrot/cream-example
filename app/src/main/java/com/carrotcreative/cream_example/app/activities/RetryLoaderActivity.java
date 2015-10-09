@@ -22,7 +22,7 @@ import java.io.Serializable;
  * You can control how many times you would like to retry, as you're the one in
  * control of calling RetryLoaer.retry() in the event of a failed attempt
  */
-public class RetryLoaderActivity extends Activity implements RetrySingleLoaderCallback {
+public class RetryLoaderActivity extends Activity implements RetrySingleLoaderCallback<GithubUser> {
 
     private boolean mSubmitLock;
     private EditText mUsernameField;
@@ -60,21 +60,18 @@ public class RetryLoaderActivity extends Activity implements RetrySingleLoaderCa
         GithubUserLoaderParams params = new GithubUserLoaderParams(userName);
 
         //Creating a StandardCacheStrategy object to plug into the Loader
-        CacheStrategy<GithubUserLoaderParams> cacheStrategy = new CachePreferred<GithubUserLoaderParams>(this);
+        CacheStrategy<GithubUserLoaderParams, GithubUser> cacheStrategy = new CachePreferred<GithubUserLoaderParams, GithubUser>(this);
 
         // Creating the loader + calling loadSelf
         GithubUserLoader loader = new GithubUserLoader(this, cacheStrategy);
 
         // Creating the Retry Loader wrapper
-        mRetryLoader = new RetrySingleLoader<GithubUserLoaderParams>(loader);
+        mRetryLoader = new RetrySingleLoader<GithubUserLoaderParams, GithubUser>(loader);
         mRetryLoader.loadSelf(params, this);
     }
 
     @Override
-    public void success(Serializable serializable, boolean fromCache) {
-        // Success!  We have the user here
-        GithubUser user = (GithubUser) serializable;
-
+    public void success(GithubUser user, boolean fromCache) {
         //Do whatever you want with it... Here we just display
         DisplayManager.displaySuccess(user, fromCache, mThisActivity);
 

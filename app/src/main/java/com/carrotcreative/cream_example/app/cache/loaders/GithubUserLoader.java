@@ -18,9 +18,9 @@ import retrofit.client.Response;
  * A normal implementation would probably extend our DefaultLoader,
  * so we can avoid filling out all of the methods.
  */
-public class GithubUserLoader extends SingleLoader<GithubUserLoaderParams> {
+public class GithubUserLoader extends SingleLoader<GithubUserLoaderParams, GithubUser> {
 
-    public GithubUserLoader(Context context, CacheStrategy<GithubUserLoaderParams> cacheStrategy) {
+    public GithubUserLoader(Context context, CacheStrategy<GithubUserLoaderParams, GithubUser> cacheStrategy) {
         super(context, cacheStrategy);
     }
 
@@ -83,7 +83,7 @@ public class GithubUserLoader extends SingleLoader<GithubUserLoaderParams> {
     @Override
     protected void loadFromSource(final GithubUserLoaderParams param, final SingleLoaderCallback singleLoaderCallback) {
 
-        final SingleLoader<GithubUserLoaderParams> thisLoader = this;
+        final SingleLoader<GithubUserLoaderParams, GithubUser> thisLoader = this;
 
         GithubAPIBuilder.getAPI().getUser(param.getUserId(), new Callback<GithubUser>() {
             @Override
